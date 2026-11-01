@@ -12,9 +12,10 @@ def test_export_writes_markdown(tmp_path):
     assert text.startswith("# Cover Letter")
     assert "Dear team" in text
     assert "Sincerely" in text
-    assert "| Inquiry type | job |" in text
-    assert "| Tone | professional |" in text
-    assert "| Model | llama3 |" in text
+    assert "- **Inquiry type:** job" in text
+    assert "- **Tone:** professional" in text
+    assert "- **Model:** llama3" in text
+    assert "## Letter" in text
 
 
 def test_export_default_path(tmp_path):

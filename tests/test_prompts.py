@@ -27,11 +27,12 @@ def test_build_messages_reselling_type():
 
 
 def test_build_messages_tone_reflected():
-    base = build_messages("job", "professional", "R", "C", "P", "S", [])
+    professional = build_messages("job", "professional", "R", "C", "P", "S", [])
     enthusiastic = build_messages("job", "enthusiastic", "R", "C", "P", "S", [])
-    assert base[1]["content"] != enthusiastic[1]["content"]
-    assert "professional" in base[1]["content"]
-    assert "enthusiastic" in enthusiastic[1]["content"]
+    # Tone must actually change the writing instruction, not just echo a label.
+    assert professional[1]["content"] != enthusiastic[1]["content"]
+    assert "polished, business-appropriate" in professional[1]["content"]
+    assert "energetic, eager" in enthusiastic[1]["content"]
 
 
 def test_unknown_tone_raises():

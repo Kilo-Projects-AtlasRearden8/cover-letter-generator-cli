@@ -1,25 +1,27 @@
 # cover-letter-cli
 
-Local-first CLI for writing cover letters — job applications and reselling
-inquiries — through any OpenAI-compatible endpoint, with **Ollama as the
-default** so no API keys are ever needed. Letters are exported to local
-Markdown files.
+A local-first command-line tool that writes cover letters for job applications
+and reselling inquiries — using any OpenAI-compatible endpoint, with Ollama as
+the default so you never need an API key.
 
 Built by [Asdale Dynamics, LLC](https://dylanasdale.github.io) (Indiana, formed
 October 2026), founded by Dylan Asdale, a registered nurse turned AI author of
-*The Massive AI Manual*. Asdale Dynamics publishes beginner-friendly AI
-education, books, guides, and practical open-source tools — written plain
-English, step by step, never condescending, like a friend would explain it.
+*The Massive AI Manual*. Like everything Asdale Dynamics puts out, this tool is
+written to be clear, warm, and beginner-friendly — explained like a friend
+would explain it, step by step, never condescending.
 
 ## What it does
 
-- Generates cover letters for **job** applications and **reselling**
-  inquiries (wholesale, dropshipping, listing partnerships, etc.)
+- Writes cover letters for **job** applications (for example, nursing,
+  healthcare, or any other role)
+- Writes cover letters for **reselling** inquiries (for example reaching out to
+  wholesalers for an eBay or Amazon reselling business)
 - Lets you pick a **tone**: professional, warm, enthusiastic, concise,
   confident, or friendly
-- Talks to any OpenAI-compatible `/v1/chat/completions` endpoint; defaults to
-  `http://localhost:11434/v1/chat/completions` (Ollama)
-- Exports each letter to a local Markdown file with a small metadata header
+- Talks to any OpenAI-compatible chat endpoint; defaults to local Ollama
+  (`http://localhost:11434/v1/chat/completions`)
+- Saves each letter as a local Markdown file — nothing leaves your machine
+  unless you choose to send it to your own endpoint
 - No secrets, no API keys, no personal data stored by the tool
 
 ## Install
@@ -35,15 +37,41 @@ pip install -e .
 cover-letter --help
 ```
 
-## Usage
+You'll need Python 3.11 or newer.
 
-Create a default config (stored at `~/.cover-letter-cli/config.toml`):
+## First-time setup
+
+Create a default config file (stored at `~/.cover-letter-cli/config.toml`):
 
 ```bash
 cover-letter init-config
 ```
 
-Write a job cover letter:
+This writes a config that points at your local Ollama endpoint with the
+`llama3` model. If you don't have Ollama running yet, install it from
+https://ollama.com and pull a model:
+
+```bash
+ollama pull llama3
+```
+
+Then check your effective configuration:
+
+```bash
+cover-letter config
+```
+
+You should see:
+
+```
+endpoint: http://localhost:11434/v1/chat/completions
+model: llama3
+tone: professional
+```
+
+## Write a cover letter
+
+### Job application
 
 ```bash
 cover-letter write --type job --tone professional \
@@ -55,7 +83,9 @@ cover-letter write --type job --tone professional \
   --key-points "Committed to patient education"
 ```
 
-Write a reselling inquiry:
+This creates `cover-letter-job.md` in your current folder.
+
+### Reselling inquiry (eBay / Amazon / wholesale)
 
 ```bash
 cover-letter write --type reselling --tone warm \
@@ -63,30 +93,38 @@ cover-letter write --type reselling --tone warm \
   --company "Bronze Goods Wholesale" \
   --position "Wholesale partnership inquiry" \
   --sender "Dylan Asdale" \
+  --key-points "eBay and Amazon seller" \
+  --key-points "Looking for wholesale inventory" \
   --output my-inquiry.md
 ```
 
-Use a different endpoint (e.g. another OpenAI-compatible server):
+This creates `my-inquiry.md`.
+
+### Pick a tone
+
+Choose from: `professional`, `warm`, `enthusiastic`, `concise`, `confident`,
+`friendly`. The tone changes how the letter is written, not just a label.
+
+### Use a different endpoint
+
+If you run another OpenAI-compatible server (for example a different local LLM):
 
 ```bash
 cover-letter --endpoint http://localhost:8080/v1/chat/completions --model mistral write ...
 ```
 
-Show effective configuration:
+### Preview without calling the endpoint
+
+Use `--dry-run` to print the prompt that would be sent, without contacting the
+LLM at all:
 
 ```bash
-cover-letter config
-```
-
-Preview the prompt without calling the endpoint:
-
-```bash
-cover-letter write --type job --dry-run ...
+cover-letter write --type job --tone professional --dry-run ...
 ```
 
 ## Testing
 
-Tests use a mocked HTTP endpoint — no network, no keys:
+Tests use a mocked HTTP endpoint — no network, no API keys:
 
 ```bash
 pytest

@@ -42,8 +42,8 @@ def save_config(config: AppConfig, path: str | Path | None = None) -> None:
     config_path = Path(path) if path else DEFAULT_CONFIG_PATH
     config_path.parent.mkdir(parents=True, exist_ok=True)
     text = (
-        f'endpoint = {config.endpoint!r}\n'
-        f'model = {config.model!r}\n'
-        f'tone = {config.tone!r}\n'
+        f'endpoint = "{config.endpoint}"\n'
+        f'model = "{config.model}"\n'
+        f'tone = "{config.tone}"\n'
     )
     config_path.write_text(text, encoding="utf-8")

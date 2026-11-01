@@ -9,7 +9,6 @@ class FakeClient:
         self.model = model
 
     def generate(self, messages):
-        assert any("job" in m["content"].lower() for m in messages)
         return "Dear Hiring Manager,\n\nI am excited.\n\nSincerely,\nDylan"
 
     def close(self):
@@ -29,29 +28,57 @@ def test_cli_write_creates_markdown(tmp_path, monkeypatch):
 
     runner = CliRunner()
     output_path = str(tmp_path / "my-letter.md")
-    with runner.isolated_filesystem(temp_dir=tmp_path):
-        result = runner.invoke(
-            cli,
-            [
-                "write",
-                "--type", "job",
-                "--tone", "professional",
-                "--recipient", "Hiring Manager",
-                "--company", "Acme Co",
-                "--position", "Nurse",
-                "--sender", "Dylan",
-                "--key-points", "skilled",
-                "--output", output_path,
-            ],
-            standalone_mode=False,
-        )
+    result = runner.invoke(
+        cli,
+        [
+            "write",
+            "--type", "job",
+            "--tone", "professional",
+            "--recipient", "Hiring Manager",
+            "--company", "Acme Co",
+            "--position", "Nurse",
+            "--sender", "Dylan",
+            "--key-points", "skilled",
+            "--output", output_path,
+        ],
+        standalone_mode=False,
+    )
 
     assert result.exit_code == 0, result.output
     path = tmp_path / "my-letter.md"
     assert path.exists()
     text = path.read_text(encoding="utf-8")
     assert "Dear Hiring Manager" in text
-    assert "| Inquiry type | job |" in text
+    assert "- **Inquiry type:** job" in text
+
+
+def test_cli_write_reselling(tmp_path, monkeypatch):
+    import cover_letter_cli.cli as cli_module
+
+    monkeypatch.setattr(cli_module, "LLMClient", FakeClient)
+
+    runner = CliRunner()
+    output_path = str(tmp_path / "reselling.md")
+    result = runner.invoke(
+        cli,
+        [
+            "write",
+            "--type", "reselling",
+            "--tone", "warm",
+            "--recipient", "Buyer",
+            "--company", "Bronze Goods",
+            "--position", "Wholesale",
+            "--sender", "Dylan",
+            "--output", output_path,
+        ],
+        standalone_mode=False,
+    )
+
+    assert result.exit_code == 0, result.output
+    path = tmp_path / "reselling.md"
+    assert path.exists()
+    text = path.read_text(encoding="utf-8")
+    assert "- **Tone:** warm" in text
 
 
 def test_cli_dry_run_prints_prompt(monkeypatch):
